@@ -1,0 +1,56 @@
+.editor-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    padding: 30px;
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  
+  .canvas-wrapper {
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 100%;
+  }
+  
+  /* This is the visible, interactive canvas */
+  .interactive-canvas {
+    max-width: 100%;
+    max-height: 65vh;
+    display: block;
+    cursor: grab;
+  }
+  
+  .interactive-canvas:active {
+    cursor: grabbing;
+  }
+  
+  .editor-controls {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 15px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .btn-green {
+    background: var(--green);
+    font-size: 16px;
+    padding: 12px 24px;
+  }
+  .btn-green:hover { background: #218838; }
