@@ -16,7 +16,6 @@ const Profile = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // In a real app, you would make a PUT request to your backend here first
     updateUser(formData);
     setSuccessMsg('Profile updated successfully!');
     setTimeout(() => setSuccessMsg(''), 3000);
