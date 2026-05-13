@@ -3,173 +3,127 @@ import './greetingCanvas.css';
 
 const GreetingCanvas = ({ template, user, onShare }) => {
   const canvasRef = useRef(null);
-  
-  // Store raw images in refs to prevent reloading on every drag frame
   const bgImgRef = useRef(new Image());
   const profImgRef = useRef(new Image());
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
-  // State for interactive editing
-  const [customText, setCustomText] = useState(user.name);
-  const [customColor, setCustomColor] = useState(template.overlayConfig?.fontColor || '#ffffff');
-  const [textPos, setTextPos] = useState({ x: 150, y: 150 });
-  const [imgPos, setImgPos] = useState({ x: 150, y: 250, radius: 50 });
-  
-  // Dragging State
-  const [draggingItem, setDraggingItem] = useState(null); // 'text', 'image', or null
+  const [customText, setCustomText] = useState("Your custom\nmessage here...");
+  const [textPos, setTextPos] = useState({ x: 300, y: 550 });
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
     setImagesLoaded(false);
-   
-    if (template.overlayConfig) {
-      if (template.overlayConfig.textPosition) setTextPos(template.overlayConfig.textPosition);
-      if (template.overlayConfig.imagePosition) setImgPos(template.overlayConfig.imagePosition);
-      if (template.overlayConfig.fontColor) setCustomColor(template.overlayConfig.fontColor);
-    }
-
+    
+    // Load Background
     bgImgRef.current.crossOrigin = "anonymous";
     bgImgRef.current.src = template.imageKitUrl;
 
+    // Safely load profile picture or fallback to initials
     profImgRef.current.crossOrigin = "anonymous";
-    profImgRef.current.src = user.profilePic || 'https://via.placeholder.com/150';
+    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=random&size=150`;
+    profImgRef.current.src = (user && user.profilePic) ? user.profilePic : fallbackAvatar;
 
     Promise.all([
       new Promise(resolve => { bgImgRef.current.onload = resolve; }),
       new Promise(resolve => { 
         profImgRef.current.onload = resolve;
         profImgRef.current.onerror = () => {
-          profImgRef.current.src = 'https://via.placeholder.com/150';
+          profImgRef.current.src = fallbackAvatar; // Ultimate fallback
           resolve();
         }
       })
     ]).then(() => {
-      const canvas = canvasRef.current;
-      canvas.width = bgImgRef.current.width;
-      canvas.height = bgImgRef.current.height;
+      canvasRef.current.width = 600; 
+      canvasRef.current.height = 750; 
       setImagesLoaded(true);
     });
   }, [template, user]);
 
-  // 2. Draw Function (Runs when images load OR when coordinates/text change)
   const drawCanvas = () => {
     if (!imagesLoaded) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
-    // Clear and draw background
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(bgImgRef.current, 0, 0);
 
-    // Draw Profile Picture
+    // Header
+    const headerHeight = 100;
+    ctx.fillStyle = '#1e293b'; 
+    ctx.fillRect(0, 0, canvas.width, headerHeight);
+
+    // Name
+    ctx.font = '600 26px system-ui, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(user.name || "Guest User", canvas.width / 2, headerHeight / 2);
+
+    // Background Image
+    ctx.drawImage(bgImgRef.current, 0, headerHeight, canvas.width, canvas.height - headerHeight);
+
+    // Profile Picture (Fix for the empty ring)
+    const profileRadius = 45;
+    const profileX = 100; 
+    const profileY = headerHeight; 
+
     ctx.save();
     ctx.beginPath();
-    ctx.arc(imgPos.x, imgPos.y, imgPos.radius, 0, Math.PI * 2, true);
-    ctx.closePath();
+    ctx.arc(profileX, profileY, profileRadius, 0, Math.PI * 2); 
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#10b981'; 
+    ctx.stroke();
     ctx.clip();
-    ctx.drawImage(profImgRef.current, imgPos.x - imgPos.radius, imgPos.y - imgPos.radius, imgPos.radius * 2, imgPos.radius * 2);
+    ctx.drawImage(profImgRef.current, profileX - profileRadius, profileY - profileRadius, profileRadius * 2, profileRadius * 2);
     ctx.restore();
 
-    // Draw Text
-    ctx.font = `bold ${template.overlayConfig?.fontSize || 40}px Arial`;
-    ctx.fillStyle = customColor;
-    ctx.textAlign = "center";
-    ctx.shadowColor = "rgba(0,0,0,0.6)";
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    ctx.fillText(customText, textPos.x, textPos.y);
+    // Custom Text
+    if (customText.trim() !== '') {
+      ctx.font = '600 28px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      
+      const lines = customText.split('\n');
+      const lineHeight = 38;
+      
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; 
+      const textBlockWidth = 460;
+      const textBlockHeight = (lines.length * lineHeight) + 20;
+      ctx.fillRect(textPos.x - (textBlockWidth / 2), textPos.y - 30, textBlockWidth, textBlockHeight);
+
+      ctx.fillStyle = '#ffffff';
+      lines.forEach((line, index) => {
+        ctx.fillText(line, textPos.x, textPos.y + (index * lineHeight)); 
+      });
+    }
   };
 
-  // Trigger draw whenever state changes
-  useEffect(() => {
-    drawCanvas();
-  }, [imagesLoaded, textPos, imgPos, customText, customColor]);
+  useEffect(() => { drawCanvas(); }, [imagesLoaded, textPos, customText]);
 
-
-  // Mouse Events for Drag and Drop
   const getMousePos = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    // Calculate scaling because CSS makes the canvas responsive
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
-    };
+    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
   };
 
-  const handleMouseDown = (e) => {
-    const pos = getMousePos(e);
-    
-    // Check if clicked near Image
-    const distToImg = Math.sqrt(Math.pow(pos.x - imgPos.x, 2) + Math.pow(pos.y - imgPos.y, 2));
-    if (distToImg <= imgPos.radius) {
-      setDraggingItem('image');
-      return;
-    }
-
-    // Check if clicked near Text (rough bounding box)
-    if (Math.abs(pos.x - textPos.x) < 150 && Math.abs(pos.y - textPos.y) < 50) {
-      setDraggingItem('text');
-      return;
-    }
-  };
-
+  const handleMouseDown = () => setDragging(true);
+  const handleMouseUp = () => setDragging(false);
   const handleMouseMove = (e) => {
-    if (!draggingItem) return;
-    const pos = getMousePos(e);
-    
-    if (draggingItem === 'text') {
+    if (dragging) {
+      const pos = getMousePos(e);
       setTextPos({ x: pos.x, y: pos.y });
-    } else if (draggingItem === 'image') {
-      setImgPos({ ...imgPos, x: pos.x, y: pos.y });
     }
-  };
-
-  const handleMouseUp = () => {
-    setDraggingItem(null);
-  };
-
-  // Export Final Image
-  const handleShareClick = () => {
-    const finalDataUrl = canvasRef.current.toDataURL("image/png");
-    onShare(finalDataUrl);
   };
 
   return (
     <div className="editor-layout">
-  
-      {imagesLoaded && (
-        <div className="editor-controls">
-          <div className="control-group">
-            <label><strong>Edit Text:</strong></label>
-            <input 
-              type="text" 
-              value={customText} 
-              onChange={(e) => setCustomText(e.target.value)} 
-              style={{padding: '5px', borderRadius: '4px', border: '1px solid #ccc'}}
-            />
+      {/* LEFT SIDE: Preview */}
+      <div className="canvas-pane">
+        {!imagesLoaded && (
+          <div style={{ color: '#64748b', fontWeight: '500' }}>
+            Loading High-Res Canvas...
           </div>
-          <div className="control-group">
-            <label><strong>Color:</strong></label>
-            <input 
-              type="color" 
-              value={customColor} 
-              onChange={(e) => setCustomColor(e.target.value)} 
-              style={{cursor: 'pointer'}}
-            />
-          </div>
-          <div style={{color: '#666', fontStyle: 'italic', marginLeft: 'auto'}}>
-            ✨ Tip: You can drag the text and image directly on the canvas!
-          </div>
-        </div>
-      )}
-
-
-      <div className="canvas-wrapper">
-        {!imagesLoaded && <div style={{ padding: '100px', textAlign: 'center' }}>Loading high-res editor...</div>}
-        
+        )}
         <canvas 
           ref={canvasRef} 
           className="interactive-canvas"
@@ -181,10 +135,27 @@ const GreetingCanvas = ({ template, user, onShare }) => {
         />
       </div>
 
+      {/* RIGHT SIDE: Controls */}
       {imagesLoaded && (
-        <button className="btn btn-green" onClick={handleShareClick}>
-          Share & Download Final Image
-        </button>
+        <div className="controls-pane">
+          <div className="control-group">
+            <label>Custom Message</label>
+            <textarea 
+              className="control-input"
+              value={customText} 
+              onChange={(e) => setCustomText(e.target.value)} 
+              rows="4"
+              placeholder="Write something beautiful..."
+            />
+            <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.75rem', lineHeight: '1.4' }}>
+              💡 <strong>Tip:</strong> Click and drag the text block directly on the image to move it.
+            </p>
+          </div>
+
+          <button className="btn" style={{ width: '100%', padding: '0.75rem' }} onClick={() => onShare(canvasRef.current.toDataURL("image/png"))}>
+            Download & Share
+          </button>
+        </div>
       )}
     </div>
   );

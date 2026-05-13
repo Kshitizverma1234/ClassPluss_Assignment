@@ -1,56 +1,85 @@
+/* --- Split Pane Layout --- */
 .editor-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-    padding: 30px;
-    background: var(--bg-light);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1000px; /* Wide enough for side-by-side */
+  margin: 0 auto;
+}
+
+/* Force side-by-side on desktop */
+@media (min-width: 800px) {
+  .editor-layout {
+    flex-direction: row;
+    align-items: flex-start;
   }
-  
-  .canvas-wrapper {
-    position: relative;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    border-radius: 8px;
-    overflow: hidden;
-    max-width: 100%;
-  }
-  
-  /* This is the visible, interactive canvas */
-  .interactive-canvas {
-    max-width: 100%;
-    max-height: 65vh;
-    display: block;
-    cursor: grab;
-  }
-  
-  .interactive-canvas:active {
-    cursor: grabbing;
-  }
-  
-  .editor-controls {
-    display: flex;
-    gap: 15px;
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 15px;
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-  }
-  
-  .control-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .btn-green {
-    background: var(--green);
-    font-size: 16px;
-    padding: 12px 24px;
-  }
-  .btn-green:hover { background: #218838; }
+}
+
+/* --- Left Pane: Canvas Preview --- */
+.canvas-pane {
+  flex: 1; /* Takes up remaining space on the left */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.interactive-canvas {
+  width: 100%;
+  max-width: 360px; /* Locks the visual size so it looks like a real card */
+  height: auto;
+  display: block;
+  cursor: grab;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* Makes the card pop */
+}
+
+.interactive-canvas:active {
+  cursor: grabbing;
+}
+
+/* --- Right Pane: Controls --- */
+.controls-pane {
+  width: 100%;
+  max-width: 350px; /* Fixed width for controls */
+  background: var(--bg-card, #ffffff);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border, #e2e8f0);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 80px;
+}
+
+.control-group {
+  margin-bottom: 1.5rem;
+}
+
+.control-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+  margin-bottom: 0.5rem;
+}
+
+.control-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  resize: vertical;
+}
+
+.control-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}

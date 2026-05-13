@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import './navbar.css';
 
 const Navbar = () => {
   const { user, logoutUser } = useAuth();
@@ -16,19 +15,31 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <Link to="/" style={{textDecoration: 'none'}}>
-        <h2>Custom Greetings</h2>
+      <Link to="/" className="navbar-brand" style={{ textDecoration: 'none' }}>
+        Greetings
       </Link>
-      <div className="nav-profile">
-        {user.isPremium && <span style={{color: '#d4af37', fontWeight: 'bold'}}>👑 Premium</span>}
-        
-        {/* Clickable profile section */}
-        <Link to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: 'inherit' }}>
-          <img src={user.profilePic} alt="Profile" className="profile-img" />
-          <span style={{fontWeight: 'bold'}}>{user.name}</span>
+      
+      <div className="navbar-actions">
+        <Link 
+          to="/profile" 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            textDecoration: 'none', 
+            color: 'inherit' 
+          }}
+          title="Go to Profile"
+        >
+          <img 
+            src={user.profilePic || 'https://via.placeholder.com/32'} 
+            alt="Profile" 
+            className="nav-profile-pic" 
+          />
+          <span className="nav-username">{user.name}</span>
         </Link>
         
-        <button className="btn" onClick={handleLogout} style={{background: '#dc3545', padding: '6px 12px'}}>Logout</button>
+        <button className="btn btn-secondary" onClick={handleLogout}>Log out</button>
       </div>
     </nav>
   );
