@@ -7,7 +7,7 @@ A full-stack web application that empowers users to create, personalize, and sea
 ---
 
 ## Live Demo & Documentation
-* **Video Demo:** [Insert Link to your Video Demo here]
+* Video Demo: https://drive.google.com/file/d/1fXyHBE0p_gKfkiW0wV4YUBZ848lyS_fI/view?usp=sharing
 * Technical Approach Document: https://drive.google.com/file/d/1eS_br6BuN4zAoLd7iFeCRrzRkhqU5XGE/view?usp=sharing
 
 ---
