@@ -2,6 +2,8 @@
 
 A full-stack web application that empowers users to create, personalize, and seamlessly share custom greeting cards. Built using the **MERN stack**, this application leverages the native **HTML5 Canvas API** for highly performant, client-side image processing and drag-and-drop personalization.
 
+<img width="1919" height="891" alt="image" src="https://github.com/user-attachments/assets/2aee69f0-52d3-48fa-9011-31793e6a6622" />
+
 ---
 
 ## Live Demo & Documentation
