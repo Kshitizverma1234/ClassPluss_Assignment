@@ -109,6 +109,6 @@ custom-greetings-app/
 ```
 
 💡 System Architecture Highlights
-Zero-Flicker Canvas Rendering: To achieve smooth drag-and-drop functionality, external template images and user avatars are cached within React useRef hooks upon initial load. The canvas strictly repaints coordinates on mouse movement rather than triggering expensive DOM re-renders.
+1. Zero-Flicker Canvas Rendering: To achieve smooth drag-and-drop functionality, external template images and user avatars are cached within React useRef hooks upon initial load. The canvas strictly repaints coordinates on mouse movement rather than triggering expensive DOM re-renders.
 
-CORS-Safe External Image Loading: All HTML5 Image objects are explicitly instantiated with crossOrigin = "anonymous" to ensure the canvas does not become "tainted," allowing the final composited image to be successfully exported via toDataURL().
+2. CORS-Safe External Image Loading: All HTML5 Image objects are explicitly instantiated with crossOrigin = "anonymous" to ensure the canvas does not become "tainted," allowing the final composited image to be successfully exported via toDataURL().
