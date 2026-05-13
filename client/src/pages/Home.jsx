@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import GreetingCanvas from '../components/GreetingCanvas';
 import PremiumModal from '../components/PremiumModal';
 import "./home.css"
+
 const CATEGORIES = ['All', 'Shayari', 'Birthday', 'Love', 'Festival', 'Updesh'];
 
 const Home = () => {
@@ -47,12 +48,12 @@ const Home = () => {
   return (
     <div className="container">
       {selectedTemplate ? (
-        <div className="editor-container">
-          <div className="editor-header">
+        <div className="editor-container" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+          <div className="editor-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', width: '100%' }}>
             <button className="btn btn-secondary" onClick={() => setSelectedTemplate(null)}>
               &larr; Back
             </button>
-            <h3>Customize Template</h3>
+            <h3 style={{ margin: 0, alignSelf: 'center' }}>Customize Template</h3>
           </div>
           <GreetingCanvas template={selectedTemplate} user={user} onShare={handleShare} />
         </div>
